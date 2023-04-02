@@ -1,6 +1,6 @@
-package ru.skypro.jdbc;
-
 import java.sql.*;
+
+import static ru.skypro.jdbc.config.ConnectionConfig.getConnection;
 
 public class Application {
     public static void main(String[] args) {
@@ -17,13 +17,5 @@ public class Application {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-    }
-    private static Connection getConnection() throws SQLException {
-        final String url = "jdbc:postgresql://localhost:5432/skypro";
-        final String user = "postgres";
-        final String password = "124421tot@";
-
-        return DriverManager.getConnection(url, user, password);
     }
 }
