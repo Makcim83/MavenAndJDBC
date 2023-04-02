@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 
-
 public class ConnectionConfig {
 
     public static Properties loadProperties(String resourceFileName) throws IOException {
@@ -25,7 +24,7 @@ public class ConnectionConfig {
 
     public static Connection getConnection() {
         Properties properties;
-        Connection connection ;
+        Connection connection;
         try {
             properties = loadProperties("application.properties");
             String url = properties.getProperty("datasource.url");
@@ -33,7 +32,7 @@ public class ConnectionConfig {
             String password = properties.getProperty("datasource.password");
             connection = DriverManager.getConnection(url, user, password);
         } catch (SQLException | IOException e) {
-            throw  new RuntimeException(e);
+            throw new RuntimeException(e);
         }
         return connection;
     }
