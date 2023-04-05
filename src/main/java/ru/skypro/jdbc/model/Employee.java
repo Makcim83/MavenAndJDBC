@@ -7,6 +7,7 @@ import lombok.*;
 
 @Getter
 @Setter
+@ToString
 
 public class Employee {
     int id;
@@ -14,30 +15,15 @@ public class Employee {
     String last_name;
     String gender;
     int age;
-    int city_id;
+    City city;
 
-
-    public Employee(String first_name, String last_name, String gender, int age, int city_id) {
-        this.first_name = first_name;
-        this.last_name = last_name;
-        this.gender = gender;
-        this.age = age;
-        this.city_id = city_id;
-    }
-
-    @Override
-    public String toString() {
-//        String stringCity = city_id != null
-//                ? ", city_id=" + city_id
-//                : "default";
-
-        return "Employee{" +
-                "id=" + id +
-                ", first_name='" + first_name + '\'' +
-                ", last_name='" + last_name + '\'' +
-                ", gender='" + gender + '\'' +
-                ", age=" + age +
-                ", city_id=" + city_id +
-                '}';
-    }
+//    public Employee(String first_name, String last_name, String gender, int age, City city) {
+//        this.first_name = first_name;
+//        this.last_name = last_name;
+//        this.gender = gender;
+//        this.age = age;
+//        this.city = city;
+//    }
 }
+
+

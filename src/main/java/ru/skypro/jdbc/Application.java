@@ -1,5 +1,6 @@
 package ru.skypro.jdbc;
 
+import ru.skypro.jdbc.model.City;
 import ru.skypro.jdbc.model.Employee;
 import ru.skypro.jdbc.service.EmployeeDaoImpl;
 
@@ -9,8 +10,9 @@ public class Application {
 
         selectAll();
 
-        Employee emp = new Employee("Ivan", "Ivanov", "male", 59, 3);
-        new EmployeeDaoImpl().updateEmployee(4, emp);
+        int idToUpdate = 4;
+        Employee emp = new Employee(idToUpdate, "Ivan", "Ivanov", "male", 59, new City(1, "Moscow"));
+        new EmployeeDaoImpl().updateEmployee(idToUpdate, emp);
 
 //        new EmployeeDaoImpl().addEmployee(new Employee ("Ivan", "Ivanovovskiy" , "male" , 33, 2));
         selectAll();

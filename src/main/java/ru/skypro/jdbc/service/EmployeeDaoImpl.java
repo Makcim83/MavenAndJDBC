@@ -1,6 +1,7 @@
 package ru.skypro.jdbc.service;
 
 import ru.skypro.jdbc.config.ConnectionConfig;
+import ru.skypro.jdbc.model.City;
 import ru.skypro.jdbc.model.Employee;
 
 import java.sql.PreparedStatement;
@@ -17,24 +18,19 @@ public class EmployeeDaoImpl implements EmployeeDAO {
         try {
             PreparedStatement statement = ConnectionConfig.getConnection().prepareStatement(
                     "SELECT * "
-                            + "FROM employee"
-//                            + "INNER JOIN city ON employee.city_id = city_id"
+                            + "FROM employee "
+                            + "INNER JOIN city ON employee.city_id = city.city_id"
             );
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                int id = Integer.parseInt(resultSet.getString("id"));
+                int id = resultSet.getInt("id");
                 String firstName = resultSet.getString("first_name");
                 String lastName = resultSet.getString("last_name");
                 String gender = resultSet.getString("gender");
-                int age = Integer.parseInt(resultSet.getString("age"));
-
-                int city_id = Integer.parseInt(resultSet.getString("city_id"));
-                employees.add(new Employee(id, firstName, lastName, gender, age, city_id));
-
-
-//                City city = new City(Integer.parseInt(resultSet.getString("city_id")),
-//                        resultSet.getString("city_name"));
-//                employees.add(new Employee(id, firstName, lastName, gender, age, city));
+                int age = resultSet.getInt("age");
+                City city = new City(Integer.parseInt(resultSet.getString("city_id")),
+                        resultSet.getString("city_name"));
+                employees.add(new Employee(id, firstName, lastName, gender, age, city));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -48,8 +44,8 @@ public class EmployeeDaoImpl implements EmployeeDAO {
         try (
                 PreparedStatement statement = ConnectionConfig.getConnection().prepareStatement(
                         "SELECT * " +
-                                "FROM employee " +
-//                                "INNER JOIN city ON employee.city_id = city_id" +
+                                "FROM employee AS e " +
+                                "INNER JOIN city AS c ON e.city_id = c.city_id " +
                                 "WHERE id = (?) ")) {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -61,11 +57,9 @@ public class EmployeeDaoImpl implements EmployeeDAO {
                 employee.setGender(resultSet.getString("gender"));
                 employee.setAge(Integer.parseInt(resultSet.getString("age")));
 
-                employee.setCity_id(resultSet.getInt("city_id"));
-
-//                City city = new City(resultSet.getInt("city_id"),
-//                        resultSet.getString("city_name"));
-//                                employee.setCity(city);
+                City city = new City(resultSet.getInt("city_id"),
+                        resultSet.getString("city_name"));
+                employee.setCity(city);
             }
 
         } catch (SQLException e) {
@@ -85,7 +79,7 @@ public class EmployeeDaoImpl implements EmployeeDAO {
             statement.setString(2, employee.getLast_name());
             statement.setString(3, employee.getGender());
             statement.setInt(4, employee.getAge());
-            statement.setInt(5, employee.getCity_id());
+            statement.setInt(5, employee.getCity().getCity_id());
 
             statement.executeUpdate();
 
@@ -98,14 +92,14 @@ public class EmployeeDaoImpl implements EmployeeDAO {
     public void updateEmployee(int id, Employee employee) {
         try (
                 PreparedStatement statement = ConnectionConfig.getConnection().prepareStatement(
-                        "UPDATE employee ( first_name, last_name, gender, age, city_id ) VALUES ( (?) , (?) , (?) , (?) , (?) ) WHERE id= (?) ")) {
+                        "UPDATE employee SET first_name=?,last_name=?, gender=?, age=?, city_id=? WHERE id= ? ")) {
             statement.setString(1, employee.getFirst_name());
             statement.setString(2, employee.getLast_name());
             statement.setString(3, employee.getGender());
             statement.setInt(4, employee.getAge());
-            statement.setInt(5, employee.getCity_id());
+            statement.setInt(5, employee.getCity().getCity_id());
 //            statement.setString(5, employee.getCity().getCity_name());
-            statement.setInt(6, employee.getId());
+            statement.setInt(6, id);
             statement.executeUpdate();
 
         } catch (SQLException e) {
