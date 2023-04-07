@@ -14,4 +14,6 @@ public interface EmployeeDAO {
     void updateEmployee(int id, Employee employee);
 
     void deleteEmployee(int id);
+
+    boolean isContainsId (int id);
 }

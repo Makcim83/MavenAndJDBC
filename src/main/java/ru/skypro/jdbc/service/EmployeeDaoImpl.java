@@ -41,29 +41,33 @@ public class EmployeeDaoImpl implements EmployeeDAO {
     @Override
     public Employee getById(int id) {
         Employee employee = new Employee();
-        try (
-                PreparedStatement statement = ConnectionConfig.getConnection().prepareStatement(
-                        "SELECT * " +
-                                "FROM employee AS e " +
-                                "INNER JOIN city AS c ON e.city_id = c.city_id " +
-                                "WHERE id = (?) ")) {
-            statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
+        if (isContainsId(id)) {
+            try (
+                    PreparedStatement statement = ConnectionConfig.getConnection().prepareStatement(
+                            "SELECT * " +
+                                    "FROM employee AS e " +
+                                    "INNER JOIN city AS c ON e.city_id = c.city_id " +
+                                    "WHERE id = (?) ")) {
+                statement.setInt(1, id);
+                ResultSet resultSet = statement.executeQuery();
 
-            if (resultSet.next()) {
-                employee.setId(resultSet.getInt(1));
-                employee.setFirst_name(resultSet.getString("first_name"));
-                employee.setLast_name(resultSet.getString("last_name"));
-                employee.setGender(resultSet.getString("gender"));
-                employee.setAge(Integer.parseInt(resultSet.getString("age")));
+                if (resultSet.next()) {
+                    employee.setId(resultSet.getInt(1));
+                    employee.setFirst_name(resultSet.getString("first_name"));
+                    employee.setLast_name(resultSet.getString("last_name"));
+                    employee.setGender(resultSet.getString("gender"));
+                    employee.setAge(Integer.parseInt(resultSet.getString("age")));
 
-                City city = new City(resultSet.getInt("city_id"),
-                        resultSet.getString("city_name"));
-                employee.setCity(city);
+                    City city = new City(resultSet.getInt("city_id"),
+                            resultSet.getString("city_name"));
+                    employee.setCity(city);
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } else {
+            System.out.println("cant get by id " + id + " (no found)");
         }
         return employee;
     }
@@ -80,7 +84,6 @@ public class EmployeeDaoImpl implements EmployeeDAO {
             statement.setString(3, employee.getGender());
             statement.setInt(4, employee.getAge());
             statement.setInt(5, employee.getCity().getCity_id());
-
             statement.executeUpdate();
 
         } catch (SQLException e) {
@@ -90,34 +93,64 @@ public class EmployeeDaoImpl implements EmployeeDAO {
 
     @Override
     public void updateEmployee(int id, Employee employee) {
-        try (
-                PreparedStatement statement = ConnectionConfig.getConnection().prepareStatement(
-                        "UPDATE employee SET first_name=?,last_name=?, gender=?, age=?, city_id=? WHERE id= ? ")) {
-            statement.setString(1, employee.getFirst_name());
-            statement.setString(2, employee.getLast_name());
-            statement.setString(3, employee.getGender());
-            statement.setInt(4, employee.getAge());
-            statement.setInt(5, employee.getCity().getCity_id());
-//            statement.setString(5, employee.getCity().getCity_name());
-            statement.setInt(6, id);
-            statement.executeUpdate();
+        if (isContainsId(id)) {
+            try (
+                    PreparedStatement statement = ConnectionConfig.getConnection().prepareStatement(
+                            "UPDATE employee SET first_name=?,last_name=?, gender=?, age=?, city_id=? WHERE id= ? ")) {
+                statement.setString(1, employee.getFirst_name());
+                statement.setString(2, employee.getLast_name());
+                statement.setString(3, employee.getGender());
+                statement.setInt(4, employee.getAge());
+                statement.setInt(5, employee.getCity().getCity_id());
+                statement.setInt(6, id);
+                statement.executeUpdate();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("cant update id " + id + " (no found)");
         }
     }
 
     @Override
     public void deleteEmployee(int id) {
+        if (isContainsId(id)) {
+            try (
+                    PreparedStatement statement = ConnectionConfig.getConnection().prepareStatement(
+                            "DELETE FROM employee " +
+                                    "WHERE id = (?) ")) {
+                statement.setInt(1, id);
+                statement.executeUpdate();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("cant delete id " + id + " (no found)");
+        }
+    }
+
+    @Override
+    public boolean isContainsId(int id) {
         try (
                 PreparedStatement statement = ConnectionConfig.getConnection().prepareStatement(
-                        "DELETE FROM employee " +
+                        "SELECT COUNT(*) " +
+                                "FROM employee " +
                                 "WHERE id = (?) ")) {
             statement.setInt(1, id);
-            statement.executeUpdate();
-
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                int idFromResultset = resultSet.getInt(1);
+                return idFromResultset == 1 ? true : false;
+            } else {
+                System.out.println("validation id : resultset is empty");
+                return true;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        System.out.println("validation id : no connection");
+        return false;
     }
 }

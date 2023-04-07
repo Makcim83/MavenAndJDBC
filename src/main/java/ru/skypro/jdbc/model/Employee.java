@@ -16,14 +16,6 @@ public class Employee {
     String gender;
     int age;
     City city;
-
-//    public Employee(String first_name, String last_name, String gender, int age, City city) {
-//        this.first_name = first_name;
-//        this.last_name = last_name;
-//        this.gender = gender;
-//        this.age = age;
-//        this.city = city;
-//    }
 }
 
 
